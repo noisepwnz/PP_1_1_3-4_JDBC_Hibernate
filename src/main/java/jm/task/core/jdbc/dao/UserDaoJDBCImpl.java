@@ -8,20 +8,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
-
+    Connection connection = null;
     private String CR_U_T = "CREATE TABLE IF NOT EXISTS Users (id INT PRIMARY KEY AUTO_INCREMENT, " +
             "name VARCHAR(30), " +
             "lastname VARCHAR(30), " +
             "age tinyint) ";
 
-    private  String D_U_T = "DROP TABLE IF EXISTS Users";
+    private String D_U_T = "DROP TABLE IF EXISTS Users";
     private String s_U = "INSERT INTO Users (name, lastName, age) VALUES (? , ? , ?) ";
     private String R_U_B_I = "DELETE FROM Users WHERE id = ?";
 
     private String G_A_U = "SELECT  * FROM users ";
 
     private String C_U_T = "DELETE  FROM Users";
-
 
 
     public UserDaoJDBCImpl() {
@@ -33,8 +32,14 @@ public class UserDaoJDBCImpl implements UserDao {
              PreparedStatement preparedStatement = connection.prepareStatement(CR_U_T)) {
 
             preparedStatement.executeUpdate();
+            connection.commit();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+            e.printStackTrace();
         }
 
     }
@@ -43,8 +48,14 @@ public class UserDaoJDBCImpl implements UserDao {
         try (Connection connection = Util.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(D_U_T)) {
             preparedStatement.executeUpdate();
+            connection.commit();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+            e.printStackTrace();
         }
     }
 
@@ -56,10 +67,15 @@ public class UserDaoJDBCImpl implements UserDao {
             preparedStatement.setString(2, lastName);
             preparedStatement.setByte(3, age);
             preparedStatement.executeUpdate();
+            connection.commit();
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+            e.printStackTrace();
         }
     }
 
@@ -69,14 +85,20 @@ public class UserDaoJDBCImpl implements UserDao {
              PreparedStatement preparedStatement = connection.prepareStatement(R_U_B_I)) {
             preparedStatement.setLong(1, id);
             preparedStatement.executeUpdate();
+            connection.commit();
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+            e.printStackTrace();
         }
     }
 
-    public List <User> getAllUsers() {
-        List <User> users = new ArrayList < > ();
+    public List<User> getAllUsers() {
+        List<User> users = new ArrayList<>();
         try (Connection connection = Util.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(G_A_U); ResultSet rs = preparedStatement.executeQuery()) {
 
@@ -88,10 +110,15 @@ public class UserDaoJDBCImpl implements UserDao {
                 user.setLastName(rs.getString(3));
                 user.setAge(rs.getByte(4));
                 users.add(user);
-
             }
+            connection.commit();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+            e.printStackTrace();
         }
         return users;
     }
@@ -102,9 +129,15 @@ public class UserDaoJDBCImpl implements UserDao {
              PreparedStatement preparedStatement = connection.prepareStatement(C_U_T)) {
 
             preparedStatement.execute();
+            connection.commit();
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+            e.printStackTrace();
         }
     }
 

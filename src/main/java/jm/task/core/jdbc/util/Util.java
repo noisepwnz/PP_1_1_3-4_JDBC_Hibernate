@@ -16,6 +16,7 @@ public class Util {
 
         try {
             connection = DriverManager.getConnection(URL, name, password);
+            connection.setAutoCommit(false);
 
             if (!connection.isClosed()) {
                 System.out.println("Соединение  с БД установлено");
@@ -27,9 +28,9 @@ public class Util {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-            return connection;
-        }
-
+        return connection;
     }
+
+}
 
 
