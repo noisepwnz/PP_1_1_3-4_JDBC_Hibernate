@@ -26,7 +26,7 @@ public class Util {
                 System.out.println("Cоединение с БД закрыто");
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
         return connection;
     }
